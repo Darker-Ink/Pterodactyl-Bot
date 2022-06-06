@@ -1,0 +1,43 @@
+{
+    "bot": {
+        "token": "",
+        "prefix": ""
+    },
+    "discord": {
+        "roles": {
+            "admin": "",
+            "mod": "",
+            "helper": "",
+            "staff": "",
+            "muted": ""
+        },
+        "commands": {
+            "serverCommandsEnabled": true,
+            "userCommandsEnabled": true,
+            "ticketCommandsEnabled": true
+        },
+        "channels": {
+            "messageLogs": "",
+            "moderationLogs": "",
+            "userLogs": "",
+            "ticketLogs": "",
+            "dmLogs": ""
+        },
+        "categories": {
+            "userCreation": "",
+            "tickets": ""
+        }
+    },
+    "pterodactyl": {
+        "panelUrl": "",
+        "adminKey": "",
+        "userKey": ""
+    },
+    "database": {
+        "host": "localhost",
+        "port": 27017,
+        "username": "admin",
+        "password": "",
+        "database": ""
+    }
+}

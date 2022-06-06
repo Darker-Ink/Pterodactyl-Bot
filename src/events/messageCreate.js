@@ -1,0 +1,65 @@
+const { Client, Message, MessageEmbed } = require("discord.js");
+const config = require("../config.json")
+module.exports = {
+    event: "messageCreate",
+    /**
+     * 
+     * @param {Client} client 
+     * @param {Message} message 
+     */
+    run: async (client, message) => {
+        if (message.author.bot) return;
+
+        if (message?.channel?.type == "DM") {
+            const chan = client.channels.cache.get(config.discord.channels.dmLogs)
+            const embed = new MessageEmbed()
+                .setTitle(`Dm From ${message.author.tag}`)
+                .setDescription(`${message?.content || "No Content"}`)
+                .setColor("BLUE")
+                .setTimestamp()
+
+            if (chan) {
+                chan.send({ embeds: [embed] }).catch(err => {
+                    console.log(`Error sending dm to logs channel: ${err}`)
+                })
+            }
+        }
+
+        if (!message.content.startsWith(config.bot.prefix)) return
+
+        const args = message.content.slice(config.bot.prefix.length).trim().split(/ +/g);
+
+        if (!client.commands.has(args[0])) return;
+
+        if (client.commands.get(args[0])?.[0]) {
+            const subcommand = args[1];
+
+            for (const command of client.commands.get(args[0])) {
+                console.log(command.name, subcommand, command.name == subcommand)
+                if (command.name !== subcommand) continue;
+
+                if (command?.requiredPermissions) {
+                    for (const permission of command.requiredPermissions) {
+                        if (!message.member.permissions.has(permission)) {
+                            message.reply(`Sorry, You don't have the \`${permission}\` permission to use this command.`);
+                            return;
+                        }
+                    }
+                }
+                command.run(client, message, args);
+            }
+        } else {
+            const cmdD = client.commands.get(args[0]);
+            if (cmdD?.requiredPermissions) {
+                for (const permission of cmdD.requiredPermissions) {
+                    if (!message.member.permissions.has(permission)) {
+                        message.reply(`Sorry, You don't have the \`${permission}\` permission to use this command.`);
+                        return;
+                    }
+                }
+            }
+
+            cmdD.run(client, message, args);
+        }
+    }
+}
