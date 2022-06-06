@@ -1,11 +1,11 @@
 const { Client, Message } = require("discord.js");
 
 module.exports = {
-    name: "example",
-    description: "This is a example command",
-    usage: "example",
-    example: "example",
-    requiredPermissions: ["MANAGE_MESSAGES"],
+    name: "mute",
+    description: "This is a sub example command",
+    usage: "mute <@user> <time> <reason>",
+    example: "mute @DarkerInk#1750 1d Spamming the chat",
+    requiredPermissions: [],
     /**
      * 
      * @param {Client} client 
@@ -14,6 +14,5 @@ module.exports = {
      */
     run: async (client, message, args) => {
         console.log(args)
-        message.reply("This is a example command");
     },
 }

@@ -4,6 +4,7 @@ module.exports = {
     name: "example",
     description: "This is a sub example command",
     usage: "example",
+    example: "example",
     requiredPermissions: ["MANAGE_MESSAGES"],
     /**
      * 
