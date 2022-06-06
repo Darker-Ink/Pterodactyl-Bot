@@ -1,10 +1,10 @@
 const { Client, Message } = require("discord.js");
 
 module.exports = {
-    name: "mute",
-    description: "This is a sub example command",
-    usage: "mute <@user> <time> <reason>",
-    example: "mute @DarkerInk#1750 1d Spamming the chat",
+    name: "ban",
+    description: "Ban a user from the server",
+    usage: "ban <@user> <reason>",
+    example: "ban @DarkerInk#1750 Being Annoying",
     requiredPermissions: [],
     /**
      * 

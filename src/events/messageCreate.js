@@ -35,7 +35,6 @@ module.exports = {
             const subcommand = args[1];
 
             for (const command of client.commands.get(args[0])) {
-                console.log(command.name, subcommand, command.name == subcommand)
                 if (command.name !== subcommand) continue;
 
                 if (command?.requiredPermissions) {
@@ -46,7 +45,7 @@ module.exports = {
                         }
                     }
                 }
-                command.run(client, message, args);
+                command.run(client, message, args.slice(2));
             }
         } else {
             const cmdD = client.commands.get(args[0]);
@@ -59,7 +58,7 @@ module.exports = {
                 }
             }
 
-            cmdD.run(client, message, args);
+            cmdD.run(client, message, args.slice(1));
         }
     }
 }

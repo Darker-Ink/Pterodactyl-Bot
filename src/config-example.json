@@ -8,8 +8,7 @@
             "admin": "",
             "mod": "",
             "helper": "",
-            "staff": "",
-            "muted": ""
+            "staff": ""
         },
         "commands": {
             "serverCommandsEnabled": true,
