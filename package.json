@@ -4,7 +4,8 @@
   "description": "Simple Host bot for Pterodactyl",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db": "if [ ! -d \"db\" ]; then mkdir db; mongod --dbpath $PWD/db; else mongod --dbpath $PWD/db; fi"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/Darker-Ink/Pterodactyl-Bot#readme",
   "dependencies": {
+    "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "chalk": "^4.1.2",
     "discord.js": "^13.8.0",

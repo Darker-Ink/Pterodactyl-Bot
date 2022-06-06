@@ -12,7 +12,6 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-        console.log(args)
         if (args[1]) {
             const cmds = client.commands.get(args[1]);
 

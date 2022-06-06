@@ -32,11 +32,5 @@
         "adminKey": "",
         "userKey": ""
     },
-    "database": {
-        "host": "localhost",
-        "port": 27017,
-        "username": "admin",
-        "password": "",
-        "database": ""
-    }
+    "mongoDB": "mongodb://localhost:27017/db"
 }
