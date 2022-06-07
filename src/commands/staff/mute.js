@@ -1,13 +1,22 @@
 const { Client, Message, MessageEmbed } = require("discord.js");
 const ms = require("ms");
-const config = require("../../config.json")
+const config = require("../../config.json");
 module.exports = {
     name: "mute",
     description: "Mute someone when they break a rule",
     usage: "mute <@user> <time> <reason>",
     example: "mute @Wumpus#0000 1d Spamming the chat",
     requiredPermissions: [],
-    checks: [],
+    checks: [{
+        check: (message) => message.member.roles.cache.has(config.discord.roles.staff),
+        error: "You do not have permission to use this command."
+    }, {
+        check: (message, args) => args?.[0] !== undefined,
+        error: "Please mention a user or provide a valid user ID."
+    }, {
+        check: (message, args) => args?.[1] !== undefined,
+        error: "Please provide a time."
+    }],
     /**
      * 
      * @param {Client} client 
@@ -16,12 +25,8 @@ module.exports = {
      */
     run: async (client, message, args) => {
 
-        if (!message.member.roles.cache.has(config.discord.roles.staff)) {
-            return message.reply(`Sorry, You do not have the required roles to run this command!`)
-        }
-
-        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
-        const time = ms(args?.[1]) || ms("5m");
+        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0])
+        const time = ms(args[1])
         const reason = args.slice(2).join(" ") || "unspecified";
 
         if (!user) return message.reply("Please mention a user to mute.");

@@ -7,7 +7,13 @@ module.exports = {
     usage: "mute <@user> <reason>",
     example: "unmute @Wumpus#0000 appealed to the staff",
     requiredPermissions: [],
-    checks: [],
+    checks: [{
+        check: (message) => message.member.roles.cache.has(config.discord.roles.staff),
+        error: "You do not have permission to use this command."
+    }, {
+        check: (message, args) => args?.[0] !== undefined,
+        error: "Please mention a user or provide a valid user ID."
+    }],
     /**
      * 
      * @param {Client} client 
@@ -15,10 +21,6 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-
-        if (!message.member.roles.cache.has(config.discord.roles.staff)) {
-            return message.reply(`Sorry, You do not have the required roles to run this command!`)
-        }
 
         const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
         const reason = args.slice(1).join(" ") || "unspecified";

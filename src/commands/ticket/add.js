@@ -13,6 +13,9 @@ module.exports = {
     }, {
         check: (message) => message.channel.name.endsWith("-ticket"),
         error: "You can only run this command in tickets."
+    }, {
+        check: (message, args) => args?.[0] !== undefined,
+        error: "Please mention a user or provide a valid user ID."
     }],
     /**
      * 
