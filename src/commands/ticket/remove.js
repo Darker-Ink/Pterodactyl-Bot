@@ -22,25 +22,22 @@ module.exports = {
      */
     run: async (client, message, args) => {
 
-        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0])?.user;
+        const user = message.mentions.members.first() || message.guild.members.cache.get(args[0])
 
         if (!user) {
             message.channel.send("Please mention a user or provide a valid user ID.");
             return;
         }
 
-
-        if (message.guild.members.cache.get(user.id).roles.cache.has(config.discord.roles.staff)) { // Do not remove this, There is no reason staff should be removed from tickets. Upgrade your ticket if you don't want a certain staff member from seeing it.
-            message.channel.send("You can't remove staff from a ticket.");
-            return;
-        }
-
-        await message.channel.updateOverwrite(user, {
+        await message.channel.permissionOverwrites.edit(user, {
             VIEW_CHANNEL: false,
             SEND_MESSAGES: false,
+            ADD_REACTIONS: false,
             READ_MESSAGE_HISTORY: false,
+            ATTACH_FILES: false,
+            EMBED_LINKS: false,
         });
 
-        message.channel.send(`${user} has been removed from this ticket.`);
+        message.channel.send(`${user} has been added to this ticket.`);
     },
 }

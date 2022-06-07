@@ -22,14 +22,14 @@ module.exports = {
      */
     run: async (client, message, args) => {
 
-        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0])?.user;
-
+        const user = message.mentions.members.first() || message.guild.members.cache.get(args[0])
+        
         if (!user) {
             message.channel.send("Please mention a user or provide a valid user ID.");
             return;
         }
 
-        await message.channel.updateOverwrite(user, {
+        await message.channel.permissionOverwrites.edit(user, {
             VIEW_CHANNEL: true,
             SEND_MESSAGES: true,
             ADD_REACTIONS: true,

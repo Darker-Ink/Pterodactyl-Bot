@@ -14,7 +14,7 @@ const client = new Client({
     allowedMentions: {
         parse: ["users", "roles"],
     },
-    partials: ["MESSAGE", "CHANNEL", "REACTION"],
+    partials: ["MESSAGE", "CHANNEL", "REACTION", "USER"],
 })
 
 client.commands = new Collection();

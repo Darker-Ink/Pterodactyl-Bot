@@ -1,7 +1,8 @@
 const { Client } = require("discord.js");
 const mongoose = require("mongoose");
 const chalk = require("chalk");
-const config = require("../config.json")
+const config = require("../config.json");
+
 module.exports = {
     event: "ready",
     /**
@@ -16,6 +17,8 @@ module.exports = {
         }).catch((err) => {
             console.log(chalk.red("[ERROR]"), `Failed to connect to database! (${err.message})`)
         })
+
+        await client.guilds.cache.get(config.bot.guild).members.fetch()
 
     }
 }

@@ -20,5 +20,11 @@ module.exports = {
      * @param {Message} message 
      * @param {Array} args 
      */
-    run: async (client, message, args) => {},
+    run: async (client, message, args) => {
+        await message.channel.permissionOverwrites.edit(config.discord.roles.staff, {
+            VIEW_CHANNEL: true,
+        });
+
+        message.channel.send(`This ticket has been downgraded to normal staff.`);
+    },
 }
