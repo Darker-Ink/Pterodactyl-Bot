@@ -53,7 +53,7 @@ module.exports = {
             .setTimestamp()
             .setColor("DARK_BLUE")
 
-        await ticket.send({ content: message.author.toString(), embeds: [embed] });
+        await ticket.send({ content: `${message.author.toString()} <@&${config.discord.roles.newTicket}>`, embeds: [embed] });
 
         message.channel.send(`Your ticket has been created! Please check ${ticket} to view your ticket!`);
 
