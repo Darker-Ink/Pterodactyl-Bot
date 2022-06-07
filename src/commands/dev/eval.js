@@ -1,11 +1,15 @@
+const config = require("../../config.json");
 const { Client, Message, MessageEmbed } = require("discord.js");
 module.exports = {
     name: "eval",
-    description: "Get the stats about the bot",
-    usage: "stats",
-    example: "stats",
+    description: "Eval Code",
+    usage: "eval <code>",
+    example: "eval message.reply('Hello World')",
     requiredPermissions: [],
-    checks: [],
+    checks: [{
+        check: (message) => message.member.roles.cache.has(config.discord.roles.developer),
+        error: "You do not have the required roles to run this command."
+        }],
     /**
      * 
      * @param {Client} client 
@@ -15,6 +19,12 @@ module.exports = {
     run: async (client, message, args) => {
         try {
             const code = args.join(" ");
+
+            if (!code) {
+                message.channel.send("Please provide some code to evaluate.");
+                return;
+            }
+
             let evaled = eval(code);
 
             if (typeof evaled !== "string") {
@@ -22,7 +32,7 @@ module.exports = {
             }
 
             const embed = new MessageEmbed()
-                .setColor("#0099ff")
+                .setColor("DARK_BLUE")
                 .setTitle("Eval")
                 .addField(`Output`, `\`\`\`js\n${evaled}\`\`\``)
                 .setDescription(`\`\`\`js\n${code}\n\`\`\``)

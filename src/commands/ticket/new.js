@@ -42,6 +42,8 @@ module.exports = {
             ],
         }).catch(console.error);
 
+        ticket.setTopic(`${message.author.id}`);
+
         const embed = new MessageEmbed()
             .setTitle(`${client.user.username} | Ticket`)
             .setDescription(`> Please do not ping staff members, This won't help you in the long run\n\nPlease Ask your question below in as much detail as you can!`)

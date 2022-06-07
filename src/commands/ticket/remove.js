@@ -29,6 +29,11 @@ module.exports = {
             return;
         }
 
+        if (message.channel.topic.includes(user.user.id)) {
+            message.channel.send("You can't remove the creator of the ticket.");
+            return;
+        }
+
         await message.channel.permissionOverwrites.edit(user, {
             VIEW_CHANNEL: false,
             SEND_MESSAGES: false,
@@ -38,6 +43,6 @@ module.exports = {
             EMBED_LINKS: false,
         });
 
-        message.channel.send(`${user} has been added to this ticket.`);
+        message.channel.send(`${user} has been remove from the ticket.`);
     },
 }

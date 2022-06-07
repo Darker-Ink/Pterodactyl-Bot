@@ -1,14 +1,16 @@
 {
     "bot": {
         "token": "",
-        "prefix": ""
+        "prefix": "",
+        "guild": ""
     },
     "discord": {
         "roles": {
             "admin": "",
             "mod": "",
             "helper": "",
-            "staff": ""
+            "staff": "",
+            "developer": ""
         },
         "commands": {
             "serverCommandsEnabled": true,
