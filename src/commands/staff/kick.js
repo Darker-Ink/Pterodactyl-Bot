@@ -4,8 +4,9 @@ module.exports = {
     name: "kick",
     description: "kick a user from the server",
     usage: "kick <@user> <reason>",
-    example: "kick @DarkerInk#1750 Being Annoying",
+    example: "kick @Wumpus#0000 Being Annoying",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 
@@ -13,6 +14,6 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-        console.log(args)
+        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
     },
 }

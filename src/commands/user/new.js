@@ -25,6 +25,7 @@ module.exports = {
     usage: "new",
     example: "new",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 
@@ -32,6 +33,7 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
+        
         if (!config.discord.commands.userCommandsEnabled) {
             message.reply("The user commands are disabled!");
             return;
@@ -51,8 +53,7 @@ module.exports = {
             return;
         }
 
-        const chan = await message.guild.channels.create(`${message.author.username}-${message.author.discriminator}`, {
-            parent: userCategory.id,
+        const chan = await userCategory.createChannel(`${message.author.username}-${message.author.discriminator}`, {
             type: "text",
             permissionOverwrites: [
                 {

@@ -4,8 +4,9 @@ module.exports = {
     name: "ban",
     description: "Ban a user from the server",
     usage: "ban <@user> <reason>",
-    example: "ban @DarkerInk#1750 Being Annoying",
+    example: "ban @Wumpus#0000 Being Annoying",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 
@@ -13,6 +14,6 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-        console.log(args)
+        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
     },
 }

@@ -23,10 +23,7 @@ const commandLoader = (client) => {
                     if (cmds.find(c => c.name === command.name)) {
                         throw new Error(`Command '${command.name}' already exists in '${file}'`);
                     } else {
-                        client.commands.get(file).push({
-                            name: command.name,
-                            run: command.run,
-                        });
+                        client.commands.get(file).push(command);
                     }
                 } else {
                     client.commands.set(file, [command]);

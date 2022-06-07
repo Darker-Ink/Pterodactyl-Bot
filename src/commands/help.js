@@ -5,6 +5,7 @@ module.exports = {
     description: "Get all commands or a specific command",
     usage: "help <command/sub command> <command>",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 

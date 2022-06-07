@@ -45,6 +45,15 @@ module.exports = {
                         }
                     }
                 }
+                if (command?.checks) {
+                    for (const check of command.checks) {
+                        if (!check.check(message, args.slice(2))) {
+                            message.reply(check?.error?.toString() || "You Failed the check.");
+                            return;
+                        }
+                    }
+                }
+
                 command.run(client, message, args.slice(2));
             }
         } else {
@@ -53,6 +62,15 @@ module.exports = {
                 for (const permission of cmdD.requiredPermissions) {
                     if (!message.member.permissions.has(permission)) {
                         message.reply(`Sorry, You don't have the \`${permission}\` permission to use this command.`);
+                        return;
+                    }
+                }
+            }
+
+            if (cmdD?.checks) {
+                for (const check of cmdD.checks) {
+                    if (!check.check(message, args.slice(1))) {
+                        message.reply(check?.error?.toString() || "You Failed the check.");
                         return;
                     }
                 }

@@ -5,8 +5,9 @@ module.exports = {
     name: "unmute",
     description: "Unmutes someone",
     usage: "mute <@user> <reason>",
-    example: "unmute @DarkerInk#1750 appealed to the staff",
+    example: "unmute @Wumpus#0000 appealed to the staff",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 
@@ -19,7 +20,7 @@ module.exports = {
             return message.reply(`Sorry, You do not have the required roles to run this command!`)
         }
 
-        const user = message.mentions.users.first();
+        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
         const reason = args.slice(1).join(" ") || "unspecified";
 
         if (!user) return message.reply("Please mention a user to unmute.");

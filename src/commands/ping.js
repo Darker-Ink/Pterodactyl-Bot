@@ -6,6 +6,7 @@ module.exports = {
     usage: "ping",
     example: "ping",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 

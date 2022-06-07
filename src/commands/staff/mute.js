@@ -5,8 +5,9 @@ module.exports = {
     name: "mute",
     description: "Mute someone when they break a rule",
     usage: "mute <@user> <time> <reason>",
-    example: "mute @DarkerInk#1750 1d Spamming the chat",
+    example: "mute @Wumpus#0000 1d Spamming the chat",
     requiredPermissions: [],
+    checks: [],
     /**
      * 
      * @param {Client} client 
@@ -19,7 +20,7 @@ module.exports = {
             return message.reply(`Sorry, You do not have the required roles to run this command!`)
         }
 
-        const user = message.mentions.users.first();
+        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0]);
         const time = ms(args?.[1]) || ms("5m");
         const reason = args.slice(2).join(" ") || "unspecified";
 
