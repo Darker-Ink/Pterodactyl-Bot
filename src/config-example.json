@@ -10,7 +10,8 @@
             "mod": "",
             "helper": "",
             "staff": "",
-            "developer": ""
+            "developer": "",
+            "newTicket": ""
         },
         "commands": {
             "serverCommandsEnabled": true,
