@@ -25,7 +25,7 @@ module.exports = {
      */
     run: async (client, message, args) => {
 
-        const user = message.mentions.users.first() || message.guild.members.cache.get(args[0])
+        const user = message.mentions.members.first() || message.guild.members.cache.get(args[0])
         const time = ms(args[1])
         const reason = args.slice(2).join(" ") || "unspecified";
 
@@ -33,21 +33,21 @@ module.exports = {
         if (time > ms("28d")) return message.reply("You can't mute someone for more than 28 days!");
         if (time < ms("5m")) return message.reply("You can't mute someone for less than 5 minutes.");
 
-        if (message.guild.members.cache.get(user.id).roles.cache.has(config.discord.roles.staff)) {
+        if (user.roles.cache.has(config.discord.roles.staff)) {
             return message.reply("You can't mute a staff member!");
         }
 
-        if (user.id == message.author.id) {
+        if (user.user.id == message.author.id) {
             return message.reply("You can't mute yourself!");
         }
 
-        message.guild.members.cache.get(user.id).timeout(time, reason).catch(err => {
+        user.timeout(time, reason).catch(err => {
             console.error(err);
             return message.reply("I was unable to mute that user.");
         })
 
         const embed = new MessageEmbed()
-            .setTitle(`${user.username} has been muted`)
+            .setTitle(`${user.user.username} has been muted`)
             .setDescription(`Reason: ${reason}`)
             .addField("Time", `${ms(time, { long: true })} (<t:${Math.round((Date.now() + time) / 1000)}:F>)`)
             .addField("Moderator", `${message.author.tag} (${message.author.id})`)
@@ -62,6 +62,6 @@ module.exports = {
             })
         }
 
-        message.reply(`${user.username} has been muted for ${ms(time, { long: true })} (Will Be UnMuted at <t:${Math.round((Date.now() + time) / 1000)}:F>)`);
+        message.reply(`${user.user.username} has been muted for ${ms(time, { long: true })} (Will Be Unmuted at <t:${Math.round((Date.now() + time) / 1000)}:F>)`);
     },
 }
