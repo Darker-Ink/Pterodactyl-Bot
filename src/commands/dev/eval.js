@@ -1,5 +1,6 @@
 const config = require("../../config.json");
 const { Client, Message, MessageEmbed } = require("discord.js");
+
 module.exports = {
     name: "eval",
     description: "Eval Code",
@@ -11,7 +12,6 @@ module.exports = {
         error: "You do not have the required roles to run this command."
         }],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 

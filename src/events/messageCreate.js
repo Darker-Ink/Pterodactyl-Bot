@@ -3,7 +3,6 @@ const config = require("../config.json")
 module.exports = {
     event: "messageCreate",
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      */

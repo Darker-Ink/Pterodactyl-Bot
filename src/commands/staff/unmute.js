@@ -15,7 +15,6 @@ module.exports = {
         error: "Please mention a user or provide a valid user ID."
     }],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 

@@ -35,5 +35,19 @@
         "adminKey": "",
         "userKey": ""
     },
+    "mail": {
+        "host": "",
+        "port": "",
+        "auth": {
+            "user": "",
+            "pass": ""
+        },
+        "from": ""
+    },
+    "redis": {
+        "host": "",
+        "port": "",
+        "password": ""
+    },
     "mongoDB": "mongodb://localhost:27017/db"
 }

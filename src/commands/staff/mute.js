@@ -18,7 +18,6 @@ module.exports = {
         error: "Please provide a time."
     }],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 

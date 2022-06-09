@@ -1,11 +1,15 @@
 const config = require("../../config.json");
 const { Client, Message, MessageEmbed } = require("discord.js");
 const UserSchema = require("../../utils/Schemas/User");
-const bycrypt = require("bcrypt");
-const createUser = require("../../utils/pterodactyl/user/create");
-
+const mailer = require("nodemailer")
 const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-const userRegex = /^[a-zA-Z0-9_]+$/;
+const bycrypt = require("bcrypt");
+
+const transporter = mailer.createTransport({
+    host: config.mail.host,
+    port: config.mail.port,
+    auth: config.mail.auth
+})
 
 const passwordGen = (length) => {
     const CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -20,10 +24,10 @@ const passwordGen = (length) => {
 }
 
 module.exports = {
-    name: "new",
-    description: "Make a new account",
-    usage: "new",
-    example: "new",
+    name: "link",
+    description: "link panel account to discord account",
+    usage: "link",
+    example: "link",
     requiredPermissions: [],
     checks: [],
     /**
@@ -32,23 +36,14 @@ module.exports = {
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-        
-        
-        if (!config.discord.commands.userCommandsEnabled) {
-            message.reply("The user commands are disabled!");
-            return;
-        }
-        
-        const userCategory = client.channels.cache.get(config.discord.categories.userCreation);      
-        
+        const userCategory = client.channels.cache.get(config.discord.categories.userCreation);
+
         if (!userCategory) {
             message.reply("The user category does not exist! Please contact a admin!");
             return;
         }
-        
-        const user = await UserSchema.findOne({ userId: message.author.id });
-        
-        if (user) {
+
+        if (await UserSchema.findOne({ userId: message.author.id })) {
             message.reply("You already have an account!");
             return;
         }
@@ -58,7 +53,7 @@ module.exports = {
 
             chan.delete()
         }
-        
+
         const chan = await userCategory.createChannel(`${message.author.username}-${message.author.discriminator}`, {
             type: "text",
             permissionOverwrites: [
@@ -74,21 +69,37 @@ module.exports = {
 
         message.reply(`Please check ${chan} to create an account!`)
 
+        const verification = passwordGen(15);
+
         let questions = [{
             question: "What is your email?",
             time: 300000,
             value: null,
             afterChecks: [{
-                check: (value) => emailRegex.test(value),
-                message: "Please enter a valid email!",
+                check: async (value) => {
+                    if (!emailRegex.test(value)) {
+                        return false;
+                    } else {
+                        const users = JSON.parse(await client.cache.get("users"));
+                        const user = users.find(u => u.email === value);
+
+                        if (!user) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                },
+                message: "Invalid Email",
             }]
         }, {
-            question: "What is your username? (Username Can Only Include from a-z, A-Z, 0-9, _)",
+            id: "verify",
+            question: "A verification code has been sent to your email. Please enter it here.",
             time: 300000,
             value: null,
             afterChecks: [{
-                check: (value) => userRegex.test(value),
-                message: "Please enter a valid username!"
+                check: (value) => value === verification,
+                message: "Invalid verification code!",
             }]
         }]
 
@@ -102,9 +113,33 @@ module.exports = {
 
         for (const question of questions) {
 
+            if (question?.id == "verify") {
+                const emailData = {
+                    from: config.mail.from,
+                    to: questions[0]?.value,
+                    subject: 'Verification Code',
+                    html: `<h1>Verification Code</h1>
+                    <p>Your verification code is: ${verification}</p>
+                    <p>Please enter this in the Discord channel!</p>
+                    <p>This code will expire in 10 minutes!</p>
+                    <p>If you did not request this, please ignore this email!</p>
+                    <footer>Requested By: ${message.author.tag} (${message.author.id}</footer>`
+                };
+
+                await transporter.sendMail(emailData).catch((err) => {
+                    console.log(err);
+                    message.channel.send("An error occured while sending the email!");
+
+                    setTimeout(() => {
+                        chan.delete();
+                    }, 5000);
+                });
+            }
+
             creationEmbed.description = question.question;
 
             await msg.edit({ embeds: [creationEmbed] })
+
 
             const collectedMsgs = await chan.awaitMessages({
                 filter: m => m.author.id === message.author.id,
@@ -118,7 +153,7 @@ module.exports = {
 
             if (!collectedMsg) {
                 chan.send("You took too long to answer the question!");
-                chan.send(`Account creation failed!`);
+                chan.send(`Account Linking failed!`);
 
                 setTimeout(() => {
                     chan.delete();
@@ -127,16 +162,16 @@ module.exports = {
             }
 
             if (collectedMsg.toLowerCase() === "cancel") {
-                chan.send("You have cancelled the creation process!");
+                chan.send("You have cancelled the linking process!");
                 return;
             }
 
             question.value = collectedMsg;
 
             for (const check of question.afterChecks) {
-                if (!check.check(question.value)) {
+                if (!await check.check(question.value)) {
                     chan.send(check.message);
-                    chan.send(`Account creation failed!`);
+                    chan.send(`Account Linking failed!`);
 
                     setTimeout(() => {
                         chan.delete();
@@ -152,69 +187,27 @@ module.exports = {
 
         const hash = await bycrypt.hash(questions[0].value, salt);
 
-        const emailCheck = await UserSchema.findOne({ email: hash });
-        const usernameCheck = await UserSchema.findOne({ username: questions[1].value });
+        const userData = JSON.parse(await client.cache.get("users"));
 
-        if (emailCheck) {
-            chan.send("That email is already in use! Please link your account instead!");
-            chan.send(`Account creation failed!`);
-
-            setTimeout(() => {
-                chan.delete();
-            }, 5000);
-            return;
-        }
-
-        if (usernameCheck) {
-            chan.send("That username is already in use! Please try another username!");
-            chan.send(`Account creation failed!`);
-
-            setTimeout(() => {
-                chan.delete();
-            }, 5000);
-            return;
-        }
-
-        const data = {
-            "username": questions[1].value.toLowerCase(),
-            "email": questions[0].value,
-            "first_name": message.author.username,
-            "last_name": message.author.discriminator,
-            "password": passwordGen(12),
-            "root_admin": false,
-            "language": "en"
-        }
-
-        creationEmbed.description = "Creating Account Please wait...";
-        creationEmbed.footer = null
-
-        const resData = await createUser(data);
-
-        if (resData.error) {
-            chan.send(`Account creation failed!\n\n${resData.data}`);
-
-            setTimeout(() => {
-                chan.delete();
-            }, 5000);
-            return;
-        }
+        const user = userData.find(u => u.email === questions[0].value);
 
         await UserSchema.create({
             userId: message.author.id,
-            consoleId: resData.data.attributes.id,
+            consoleId: user.id,
             email: hash,
-            username: questions[1].value.toLowerCase(),
+            username: user.username,
             domains: [],
             linkDate: Date.now(),
             premiumCount: 0,
             premiumUsed: 0,
         })
 
-        creationEmbed.description = `Panel: ${config.pterodactyl.panelUrl}\nUsername: ${data.username}\nEmail: ${data.email}\nPassword: ${data.password}`;
+        creationEmbed.description = `Account Linked! Successfully linked ${user.username} to your account!`;
         creationEmbed.footer = null;
 
         await msg.edit({ embeds: [creationEmbed] })
 
         return;
+
     },
 }

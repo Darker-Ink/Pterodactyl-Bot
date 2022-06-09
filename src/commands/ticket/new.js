@@ -12,7 +12,6 @@ module.exports = {
         error: "Ticket commands are disabled."
     }],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 

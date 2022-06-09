@@ -8,7 +8,6 @@ module.exports = {
     requiredPermissions: [],
     checks: [],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 

@@ -11,7 +11,6 @@ module.exports = {
         error: "You can't run this in a channel called example" // Error is the message it should respond with if the user failed the check.
     }],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 
