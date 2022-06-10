@@ -1,7 +1,8 @@
 {
     "bot": {
         "token": "",
-        "prefix": ""
+        "prefix": "",
+        "guild": ""
     },
     "discord": {
         "roles": {
@@ -9,7 +10,8 @@
             "mod": "",
             "helper": "",
             "staff": "",
-            "muted": ""
+            "developer": "",
+            "newTicket": ""
         },
         "commands": {
             "serverCommandsEnabled": true,
@@ -21,11 +23,15 @@
             "moderationLogs": "",
             "userLogs": "",
             "ticketLogs": "",
-            "dmLogs": ""
+            "dmLogs": "",
+            "welcome": ""
         },
         "categories": {
             "userCreation": "",
             "tickets": ""
+        },
+        "messages": {
+            "welcome": "Welcome to {server_name}, {user_ping}!"
         }
     },
     "pterodactyl": {
@@ -33,11 +39,19 @@
         "adminKey": "",
         "userKey": ""
     },
-    "database": {
-        "host": "localhost",
-        "port": 27017,
-        "username": "admin",
-        "password": "",
-        "database": ""
-    }
+    "mail": {
+        "host": "",
+        "port": "",
+        "auth": {
+            "user": "",
+            "pass": ""
+        },
+        "from": ""
+    },
+    "redis": {
+        "host": "",
+        "port": "",
+        "password": ""
+    },
+    "mongoDB": "mongodb://localhost:27017/db"
 }

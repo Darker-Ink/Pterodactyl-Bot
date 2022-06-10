@@ -5,14 +5,13 @@ module.exports = {
     description: "Get all commands or a specific command",
     usage: "help <command/sub command> <command>",
     requiredPermissions: [],
+    checks: [],
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      * @param {Array} args 
      */
     run: async (client, message, args) => {
-        console.log(args)
         if (args[1]) {
             const cmds = client.commands.get(args[1]);
 

@@ -1,9 +1,9 @@
 const { Client, Message, MessageEmbed } = require("discord.js");
 const config = require("../config.json")
+
 module.exports = {
     event: "messageCreate",
     /**
-     * 
      * @param {Client} client 
      * @param {Message} message 
      */
@@ -35,7 +35,6 @@ module.exports = {
             const subcommand = args[1];
 
             for (const command of client.commands.get(args[0])) {
-                console.log(command.name, subcommand, command.name == subcommand)
                 if (command.name !== subcommand) continue;
 
                 if (command?.requiredPermissions) {
@@ -46,7 +45,16 @@ module.exports = {
                         }
                     }
                 }
-                command.run(client, message, args);
+                if (command?.checks) {
+                    for (const check of command.checks) {
+                        if (!check.check(message, args.slice(2))) {
+                            message.reply(check?.error?.toString() || "You Failed the check.");
+                            return;
+                        }
+                    }
+                }
+
+                command.run(client, message, args.slice(2));
             }
         } else {
             const cmdD = client.commands.get(args[0]);
@@ -59,7 +67,16 @@ module.exports = {
                 }
             }
 
-            cmdD.run(client, message, args);
+            if (cmdD?.checks) {
+                for (const check of cmdD.checks) {
+                    if (!check.check(message, args.slice(1))) {
+                        message.reply(check?.error?.toString() || "You Failed the check.");
+                        return;
+                    }
+                }
+            }
+
+            cmdD.run(client, message, args.slice(1));
         }
     }
 }
