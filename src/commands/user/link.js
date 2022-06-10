@@ -123,7 +123,7 @@ module.exports = {
                     <p>Please enter this in the Discord channel!</p>
                     <p>This code will expire in 10 minutes!</p>
                     <p>If you did not request this, please ignore this email!</p>
-                    <footer>Requested By: ${message.author.tag} (${message.author.id}</footer>`
+                    <footer>Requested By: ${message.author.tag} (${message.author.id})</footer>`
                 };
 
                 await transporter.sendMail(emailData).catch((err) => {

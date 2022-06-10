@@ -178,8 +178,8 @@ module.exports = {
         const data = {
             "username": questions[1].value.toLowerCase(),
             "email": questions[0].value,
-            "first_name": message.author.username,
-            "last_name": message.author.discriminator,
+            "first_name": message.author.tag,
+            "last_name": message.author.id,
             "password": passwordGen(12),
             "root_admin": false,
             "language": "en"
