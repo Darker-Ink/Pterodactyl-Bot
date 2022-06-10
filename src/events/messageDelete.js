@@ -16,6 +16,8 @@ module.exports = {
             return;
         }
 
+        if (message.author.id == client.user.id) return;
+
         const embed = new MessageEmbed()
             .setAuthor({
                 name: `Message Deleted By ${message.author.tag}`,
