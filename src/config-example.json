@@ -23,11 +23,15 @@
             "moderationLogs": "",
             "userLogs": "",
             "ticketLogs": "",
-            "dmLogs": ""
+            "dmLogs": "",
+            "welcome": ""
         },
         "categories": {
             "userCreation": "",
             "tickets": ""
+        },
+        "messages": {
+            "welcome": "Welcome to {server_name}, {user_ping}!"
         }
     },
     "pterodactyl": {

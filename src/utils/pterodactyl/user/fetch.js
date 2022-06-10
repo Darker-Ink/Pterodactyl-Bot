@@ -20,6 +20,7 @@ const fetchUsers = async () => {
             username: user.attributes.username,
             email: user.attributes.email,
             firstName: user.attributes.first_name,
+            lastName: user.attributes.last_name,
             createdAt: user.attributes.created_at,
             updatedAt: user.attributes.updated_at,
         }

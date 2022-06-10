@@ -1,5 +1,6 @@
 const { Client, Message, MessageEmbed } = require("discord.js");
 const config = require("../config.json")
+
 module.exports = {
     event: "messageCreate",
     /**

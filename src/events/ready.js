@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const chalk = require("chalk");
 const config = require("../config.json");
 const fetchUsers = require("../utils/pterodactyl/user/fetch");
+
 module.exports = {
     event: "ready",
     /**
