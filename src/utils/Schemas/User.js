@@ -4,7 +4,7 @@ const UserSchema = new mongoose.Schema({
     // The Discord ID of the user
     userId: {
         type: String,
-        required: true,
+        required: false,
         unique: true
     },
 
@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     consoleId: {
         type: String,
         required: true,
-        unique: true
+        unique: false
     },
 
     // The Email of the User (hashed)
@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true
+        unique: false
     },
 
     // The Domains of the user
@@ -38,22 +38,7 @@ const UserSchema = new mongoose.Schema({
     // The Date the user linked their account
     linkDate: {
         type: Date,
-        required: true,
-        default: Date.now
-    },
-    
-    // The Amount of premium servers they can make
-    premiumCount: {
-        type: Number,
-        required: true,
-        default: 0
-    },
-
-    // The Amount of premium servers they have used
-    premiumUsed: {
-        type: Number,
-        required: true,
-        default: 0
+        required: false
     },
 })
 

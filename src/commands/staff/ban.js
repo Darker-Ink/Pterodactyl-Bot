@@ -1,5 +1,6 @@
-const { Client, Message, MessageEmbed } = require("discord.js");
+const { Client, Message, EmbedBuilder, Colors } = require("discord.js");
 const config = require("../../config.json");
+const punishmentsSchema = require("../../utils/Schemas/Punishments");
 
 module.exports = {
     name: "ban",
@@ -54,13 +55,15 @@ module.exports = {
             return;
         }
 
-        const logEmbed = new MessageEmbed()
+        const logEmbed = new EmbedBuilder()
             .setTitle(`${client.user.username} | Ban`)
             .setDescription(`${user.user.toString()} (${user.user.id}) has been banned from the server.`)
-            .addField("Reason", reason)
-            .addField("Moderator", `${message.author.tag} (${message.author.id})`)
+            .addFields(
+                { name: "Reason", value: reason },
+                { name: "Moderator", value: `${message.author.tag} (${message.author.id})` }
+            )
             .setTimestamp()
-            .setColor("DARK_BLUE")
+            .setColor(Colors.DarkBlue)
 
         const chan = message.guild.channels.cache.get(config.discord.channels.moderationLogs);
 
@@ -71,5 +74,30 @@ module.exports = {
         await user.ban({ reason: reason });
 
         message.channel.send(`${user.user.toString()} has been banned from the server.`);
+
+        const punishment = await punishmentsSchema.findOne({
+            userId: user.user.id,
+        });
+
+        if (!punishment) {
+            await punishmentsSchema.create({
+                userId: user?.user?.id,
+                bans: [{
+                    moderator: message.author.id,
+                    reason: reason,
+                    date: new Date()
+                }]
+            });
+        } else {
+            await punishment.update({
+                $push: {
+                    bans: {
+                        moderator: message.author.id,
+                        reason: reason,
+                        date: new Date()
+                    }
+                }
+            });
+        }
     },
 }

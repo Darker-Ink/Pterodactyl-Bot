@@ -1,5 +1,6 @@
+const punishmentsSchema = require("../../utils/Schemas/Punishments");
 const config = require("../../config.json");
-const { Client, Message, MessageEmbed } = require("discord.js");
+const { Client, Message, EmbedBuilder, Colors } = require("discord.js");
 
 module.exports = {
     name: "add",
@@ -24,6 +25,13 @@ module.exports = {
      */
     run: async (client, message, args) => {
 
+        const userData = await punishmentsSchema.findOne({ userId: message.author.id })
+
+        if (userData && userData.ticketBanned) {
+            message.channel.send("You have been banned from making a ticket.");
+            return;
+        }
+
         const user = message.mentions.members.first() || message.guild.members.cache.get(args[0])
 
         if (!user) {
@@ -32,14 +40,27 @@ module.exports = {
         }
 
         await message.channel.permissionOverwrites.edit(user, {
-            VIEW_CHANNEL: true,
-            SEND_MESSAGES: true,
-            ADD_REACTIONS: true,
-            READ_MESSAGE_HISTORY: true,
-            ATTACH_FILES: true,
-            EMBED_LINKS: true,
+            ViewChannel: true,
+            SendMessages: true,
+            AddReactions: true,
+            ReadMessageHistory: true,
+            AttachFiles: true,
+            EmbedLinks: true,
         });
 
         message.channel.send(`${user} has been added to this ticket.`);
+
+        const ticketLoggingChannel = message.guild.channels.cache.get(config.discord.channels.ticketLogs);
+
+        if (ticketLoggingChannel) {
+            const embed = new EmbedBuilder()
+                .setTitle('User Added to Ticket')
+                .setDescription(`**User**: ${user.tag} (${user.id})\n**Ticket**: ${message.channel} (${message.channelId})\n**Added By**: ${message.author.tag} (${message.author.id})`)
+                .setTimestamp()
+                .setColor(Colors.Green)
+                .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
+
+            ticketLoggingChannel.send({ embeds: [embed] });
+        }
     },
 }
