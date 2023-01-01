@@ -1,29 +1,36 @@
 {
-  "name": "hosting-bot",
-  "version": "1.0.0",
-  "description": "Simple Host bot for Pterodactyl",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "db": "if [ ! -d \"db\" ]; then mkdir db; mongod --dbpath $PWD/db; else mongod --dbpath $PWD/db; fi"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Darker-Ink/Pterodactyl-Bot.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Darker-Ink/Pterodactyl-Bot/issues"
-  },
-  "homepage": "https://github.com/Darker-Ink/Pterodactyl-Bot#readme",
-  "dependencies": {
-    "axios": "^0.27.2",
-    "bcrypt": "^5.0.1",
-    "chalk": "^4.1.2",
-    "discord.js": "^13.8.0",
-    "mongoose": "^6.3.5",
-    "nodemailer": "^6.7.5",
-    "redis": "^4.1.0"
-  }
+    "name": "hosting-bot",
+    "version": "1.0.0",
+    "description": "Simple Host bot for Pterodactyl",
+    "main": "src/index.js",
+    "scripts": {
+        "web": "nodemon .",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "db": "if [ ! -d \"db\" ]; then mkdir db; mongod --dbpath $PWD/db; else mongod --dbpath $PWD/db; fi"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/DanBot-Hosting/DanBotHostingStats.git"
+    },
+    "author": "",
+    "license": "GPL-3.0-or-later",
+    "bugs": {
+        "url": "https://github.com/DanBot-Hosting/DanBotHostingStats/issues"
+    },
+    "homepage": "https://github.com/DanBot-Hosting/DanBotHostingStats#readme",
+    "dependencies": {
+        "axios": "^0.27.2",
+        "bcrypt": "^5.0.1",
+        "chalk": "^4.1.2",
+        "discord.js": "^14.1.1",
+        "fastify": "^4.5.2",
+        "mongoose": "^6.4.6",
+        "nodemailer": "^6.7.7",
+        "ping-tcp-js": "^1.4.1",
+        "pino-pretty": "^9.1.0",
+        "redis": "^4.2.0",
+        "tiny-glob": "^0.2.9",
+        "undici": "^5.8.0"
+    },
+    "packageManager": "yarn@3.3.0"
 }

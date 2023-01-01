@@ -1,5 +1,7 @@
-const { Client, Message, MessageEmbed } = require("discord.js");
-const resetPassword = require("../../utils/pterodactyl/user/resetPassword");
+const config = require("../../config.json");
+const { Client, Message } = require("discord.js");
+const Pterodactyl = require('../../utils/pterodactyl/index');
+const ptero = new Pterodactyl();
 const UserSchema = require("../../utils/Schemas/User");
 
 const passwordGen = (length) => {
@@ -15,12 +17,15 @@ const passwordGen = (length) => {
 }
 
 module.exports = {
-    name: "resetpassword",
+    name: "password",
     description: "reset user password",
-    usage: "resetpassword",
-    example: "resetpassword",
+    usage: "password",
+    example: "password",
     requiredPermissions: [],
-    checks: [],
+    checks: [{
+        check: () => config.discord.commands.userCommandsEnabled,
+        error: "The user commands are disabled!"
+    }],
     /** 
      * @param {Client} client 
      * @param {Message} message 
@@ -40,7 +45,7 @@ module.exports = {
 
         const userData = fetchedData.find(u => u.id == user.consoleId);
 
-        await resetPassword(userData, password);
+        await ptero.user.resetPassword(userData, password);
 
         message.author.send(`Your Password Has Been Reset!\n\nNew Password: ||${password}||`).catch(() => {
             return message.channel.send("Please Enable DMs to Receive Your New Password!");

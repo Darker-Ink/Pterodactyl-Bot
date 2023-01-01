@@ -1,8 +1,12 @@
-const { Client } = require("discord.js");
+const fs = require('fs');
+const { Client, EmbedBuilder, Colors } = require("discord.js");
 const mongoose = require("mongoose");
 const chalk = require("chalk");
 const config = require("../config.json");
-const fetchUsers = require("../utils/pterodactyl/user/fetch");
+const axios = require("axios");
+const tcpPing = require("ping-tcp-js");
+const Pterodactyl = require('../utils/pterodactyl/index');
+const ptero = new Pterodactyl();
 
 module.exports = {
     event: "ready",
@@ -19,20 +23,107 @@ module.exports = {
         })
 
         await client.cache.connect()
-        await client.cache.set("users", JSON.stringify(await fetchUsers()), 600000)
+        await client.cache.set("users", JSON.stringify(await ptero.user.fetchUsers()), 600000)
 
-        const guild = client.guilds.cache.get(config.bot.guild)
+        const guild = await client.guilds.fetch(config.bot.guild)
 
         await guild.members.fetch()
 
-        for (const chan in guild.channels.cache.values()) {
-            if (chan?.parentId !== config.discord.categories.userCreation) continue;
+        for (const channel of guild.channels.cache.values()) {
+            if (channel.parentId !== config.discord.categories.userCreation) continue;
 
-            chan.delete()
+            await channel.delete()
         }
 
-        client.cacheInterval = setInterval(async () => {
-            await client.cache.set("users", JSON.stringify(await fetchUsers()), 600000)
-        }, 600000)
+        setInterval(async () => {
+            await client.cache.set("users", JSON.stringify(await ptero.nodes.fetchUsers()), 600000)
+        }, 600000);
+
+        let statusMessage = await client.guilds.cache.get(config.bot.guild)?.channels?.cache?.get(config.bot.nodeStatus.channelId)?.messages?.fetch(config.bot.nodeStatus.messageId);
+
+        setInterval(async () => {
+            if (!statusMessage) {
+                statusMessage = await client.guilds.cache.get(config.bot.guild)?.channels?.cache?.get(config.bot.nodeStatus.channelId)?.send('Waiting...')
+
+                config.bot.nodeStatus.messageId = statusMessage.id;
+
+                fs.writeFileSync('./config.json', JSON.stringify(config, null, 4))
+            }
+
+            const nodes = await ptero.nodes.getNodes();
+
+            const nodeDataParsed = nodes.data.data.map(node => {
+                return {
+                    id: node.attributes.id,
+                    name: node.attributes.name,
+                    public: node.attributes.public,
+                    fqdn: node.attributes.fqdn,
+                    daemon_listen: node.attributes.daemon_listen,
+                    scheme: node.attributes.scheme,
+                };
+            })
+
+            const nodeStatus = {};
+
+            for (const node of nodeDataParsed) {
+                try {
+                    const response = await axios({
+                        method: "options",
+                        url: `${node.scheme}://${node.fqdn}:${node.daemon_listen}/api/system`,
+                    })
+
+                    if (response.status === 204) {
+                        nodeStatus[node.id] = {
+                            ...node,
+                            status: "online",
+                        }
+                    }
+                } catch (e) {
+                    if (e.code == "ECONNREFUSED") {
+                        nodeStatus[node.id] = {
+                            ...node,
+                            status: "wings offline",
+                        }
+                    }
+                }
+            }
+
+            for (const n in nodeStatus) {
+                const node = nodeStatus[n];
+
+                if (node.status === "wings offline") {
+                    tcpPing.ping(node.fqdn, 80).catch(() => {
+                        nodeStatus[n] = {
+                            ...node,
+                            status: "offline",
+                        }
+                    })
+                }
+            }
+
+            const statusEmbed = {
+                title: "Node Status",
+                description: '',
+                timestamp: new Date(),
+                color: Colors.Orange
+            }
+
+            for (const n in nodeStatus) {
+                const node = nodeStatus[n];
+
+                const amount = ((await ptero.nodes.getAllocations(node.id))?.data?.data?.length) ?? "N/A";
+                const used = ((await ptero.nodes.getServers(node.id))?.data?.attributes?.relationships?.servers?.data?.length) ?? "N/A";
+
+                const status = node.status === "online" ? "🟢 Online" : node.status === "wings offline" ? "🟠 Wings" : "🔴 Offline";
+
+                statusEmbed.description = `${statusEmbed?.description ?? ""}\n**${node.name}**: ${status} (${used}/${amount})`;
+            }
+
+            statusMessage.edit({
+                embeds: [statusEmbed]
+            });
+
+        }, config.bot.nodeStatus.refreshInterval);
+
     }
 }

@@ -1,5 +1,5 @@
 const config = require("../../config.json");
-const { Client, Message, MessageEmbed } = require("discord.js");
+const { Client, Message, EmbedBuilder, Colors, ChannelType } = require("discord.js");
 const UserSchema = require("../../utils/Schemas/User");
 const mailer = require("nodemailer")
 const emailRegex = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
@@ -29,7 +29,10 @@ module.exports = {
     usage: "link",
     example: "link",
     requiredPermissions: [],
-    checks: [],
+    checks: [{
+        check: () => config.discord.commands.userCommandsEnabled,
+        error: "The user commands are disabled!"
+    }],
     /**
      * @param {Client} client 
      * @param {Message} message 
@@ -48,26 +51,22 @@ module.exports = {
             return;
         }
 
-        for (const chan of message.guild.channels.cache.values()) {
-            if (chan.name !== `${message.author.tag.replace("#", "-").toLowerCase()}` && chan?.parentId !== config.discord.categories.userCreation) continue;
 
-            chan.delete()
-        }
-
-        const chan = await userCategory.createChannel(`${message.author.username}-${message.author.discriminator}`, {
-            type: "text",
+        const chan = await userCategory.create({
+            name: `${message.author.username}-${message.author.discriminator}`,
+            type: ChannelType.GuildText,
             permissionOverwrites: [
                 {
                     id: message.guild.id,
-                    deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
+                    deny: ["ViewChannel", "SendMessages"],
                 }, {
                     id: message.author.id,
-                    allow: ["VIEW_CHANNEL", "SEND_MESSAGES", "READ_MESSAGE_HISTORY"],
+                    allow: ["ViewChannel", "SendMessages", "ReadMessageHistory"],
                 },
             ],
         }).catch(console.error);
 
-        message.reply(`Please check ${chan} to create an account!`)
+        message.reply(`Please check ${chan} to link an account!`)
 
         const verification = passwordGen(15);
 
@@ -103,8 +102,8 @@ module.exports = {
             }]
         }]
 
-        let creationEmbed = new MessageEmbed()
-            .setColor("GREEN")
+        let creationEmbed = new EmbedBuilder()
+            .setColor(Colors.Green)
             .setFooter({
                 text: "You can type 'cancel' to cancel the creation process!",
             })
@@ -114,6 +113,12 @@ module.exports = {
         for (const question of questions) {
 
             if (question?.id == "verify") {
+
+                creationEmbed.description = `Sending Verification Email...`
+
+                await msg.edit({ embeds: [creationEmbed] })
+
+
                 const emailData = {
                     from: config.mail.from,
                     to: questions[0]?.value,
@@ -163,6 +168,10 @@ module.exports = {
 
             if (collectedMsg.toLowerCase() === "cancel") {
                 chan.send("You have cancelled the linking process!");
+
+                setTimeout(() => {
+                    chan.delete();
+                }, 5000);
                 return;
             }
 
@@ -183,9 +192,24 @@ module.exports = {
 
         }
 
+        creationEmbed.description = `Linking Account..`
+
+        await msg.edit({ embeds: [creationEmbed] })
+
+
         const salt = await bycrypt.genSalt(15);
 
         const hash = await bycrypt.hash(questions[0].value, salt);
+
+        if (await UserSchema.findOne({ email: hash })) {
+            chan.send("This email is already in use!");
+            chan.send(`Account Linking failed!`);
+
+            setTimeout(() => {
+                chan.delete();
+            }, 5000);
+            return;
+        }
 
         const userData = JSON.parse(await client.cache.get("users"));
 
@@ -202,10 +226,27 @@ module.exports = {
             premiumUsed: 0,
         })
 
+        const logEmbed = new MessageEmbed()
+            .setColor(Colors.Green)
+            .setTitle("User linked")
+            .setDescription(`${message.author} has linked an account!`)
+            .addFields({
+                name: "Username",
+                value: user.username.toString()
+            })
+
+        const logChan = message.guild.channels.cache.get(config.discord.channels.userLogs)
+
+        if (logChan) {
+            logChan.send({ embeds: [logEmbed] })
+        }
+
         creationEmbed.description = `Account Linked! Successfully linked ${user.username} to your account!`;
         creationEmbed.footer = null;
 
         await msg.edit({ embeds: [creationEmbed] })
+
+        message.member.roles.add(config.discord.roles.client).catch(console.error);
 
         return;
 

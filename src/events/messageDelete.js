@@ -1,4 +1,4 @@
-const { Client, Message, MessageEmbed } = require("discord.js");
+const { Client, Message, EmbedBuilder, Colors } = require("discord.js");
 const config = require("../config.json")
 
 module.exports = {
@@ -10,6 +10,8 @@ module.exports = {
     run: async (client, message) => {
         const logChannel = client.channels.cache.get(config.discord.channels.messageLogs);
 
+        if (message.channel.parentId == config.discord.categories.userCreation) return;
+
         if (!logChannel) return;
 
         if (message.partial) {
@@ -18,14 +20,13 @@ module.exports = {
 
         if (message.author.id == client.user.id) return;
 
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setAuthor({
                 name: `Message Deleted By ${message.author.tag}`,
                 iconURL: message.author.displayAvatarURL()
             })
             .setDescription(`${message.content || "No Content"}`)
-            .setImage(message.attachments.first()?.url || "")
-            .setColor("RED")
+            .setColor(Colors.Red)
             .setTimestamp()
             .setFooter({
                 text: `Deleted in: ${message.channel.name}`,
